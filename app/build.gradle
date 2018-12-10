@@ -18,6 +18,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
 }
 
 dependencies {
@@ -42,4 +45,7 @@ dependencies {
 
     implementation 'io.opentracing:opentracing-api:0.31.0'
     implementation 'io.opentracing:opentracing-mock:0.31.0'
+
+    implementation 'io.jaegertracing:jaeger-client:0.32.0'
+    implementation 'org.slf4j:slf4j-android:1.7.25'
 }

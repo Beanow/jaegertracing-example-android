@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">ExampleTracingApp</string>
     <string name="traces_finished">Traces finished: %d\nMost recent:\n%s</string>
+    <string name="traces_private">Can\'t inspect trace information.\nNot using the mock tracker.</string>
 </resources>

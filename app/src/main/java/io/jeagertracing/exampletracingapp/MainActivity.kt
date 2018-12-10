@@ -12,6 +12,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import java.lang.ClassCastException
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,13 +21,12 @@ class MainActivity : AppCompatActivity() {
     private var mainText: TextView? = null
 
     private fun onPressTrace() {
-
-        // Create the span on the main thread.
-        val span = tracer.buildSpan("onPressTrace").start()
-        span.log(mapOf(Fields.MESSAGE to "Press received"))
-
         // Drop into a background coroutine.
         GlobalScope.launch {
+
+            // Create the span in our processing thread.
+            val span = tracer.buildSpan("onPressTrace").ignoreActiveSpan().start()
+            span.log(mapOf(Fields.MESSAGE to "Press received"))
 
             // Slow down here.
             delay(500L)
@@ -46,13 +46,17 @@ class MainActivity : AppCompatActivity() {
         GlobalScope.launch(Dispatchers.Main) {
 
             // Cast the tracer to have a look at the internals.
-            val mockTracer = tracer as MockTracer
-            val finished = mockTracer.finishedSpans()
-            mainText?.text = resources.getString(
-                R.string.traces_finished,
-                finished.size,
-                if (finished.size > 0) finished.last().toString() else ""
-            )
+            try {
+                val mockTracer = tracer as MockTracer
+                val finished = mockTracer.finishedSpans()
+                mainText?.text = resources.getString(
+                    R.string.traces_finished,
+                    finished.size,
+                    if (finished.size > 0) finished.last().toString() else ""
+                )
+            } catch (e: ClassCastException) {
+                mainText?.setText(R.string.traces_private)
+            }
         }
     }
 
